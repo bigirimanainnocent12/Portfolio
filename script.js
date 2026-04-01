@@ -89,9 +89,29 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 3. Reveal Animation
+    // 3. Reveal Animation & ScrollSpy
     const revealElements = document.querySelectorAll('.reveal, .reveal-right');
-    const revealOnScroll = () => {
+    const sections = document.querySelectorAll('section');
+    const navLinks = document.querySelectorAll('.nav-links a');
+
+    const handleScroll = () => {
+        const scrollPosition = window.scrollY + 100;
+
+        // Scroll Progress logic
+        const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (winScroll / height) * 100;
+        document.getElementById("scroll-progress").style.width = scrolled + "%";
+
+        // Back to Top button visibility
+        const backToTop = document.getElementById('back-to-top');
+        if (window.scrollY > 500) {
+            backToTop.classList.add('show');
+        } else {
+            backToTop.classList.remove('show');
+        }
+
+        // Reveal Animation logic
         const triggerBottom = window.innerHeight * 0.85;
         revealElements.forEach(el => {
             const elTop = el.getBoundingClientRect().top;
@@ -99,9 +119,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 el.classList.add('active');
             }
         });
+
+        // ScrollSpy logic
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            const sectionHeight = section.clientHeight;
+            const sectionId = section.getAttribute('id');
+
+            if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                    if (link.getAttribute('href') === `#${sectionId}`) {
+                        link.classList.add('active');
+                    }
+                });
+            }
+        });
     };
-    window.addEventListener('scroll', revealOnScroll);
-    revealOnScroll();
+
+    window.addEventListener('scroll', handleScroll);
+    handleScroll(); // Initial call
 
     // 4. Mobile Menu Toggle
     const menuToggle = document.getElementById('mobile-menu');
